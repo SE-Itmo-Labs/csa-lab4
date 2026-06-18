@@ -1,0 +1,37 @@
+% Сигнатура игнорируется %
+{integer someVar; boolean someVar2, char test}
+integer main (
+    % 1. Вывод C-String из памяти %
+    print('Testing Kronstadt Language!\n')
+    
+    % 2. Числа с плавающей точкой (IEEE-754) %
+    float test = 12.5f
+    float test2 = 3.0f
+    print('Float math 12.5 - 3.0 = ')
+    print(test - test2)
+    print('\n')
+
+    % 3. Цикл FOR и целые числа %
+    integer result = 0
+    for {integer i = 0 : i < 5 : i = i + 1} (
+        result = result + 2
+    )
+    print('For loop result (0+2*5) = ')
+    print(result)
+    print('\n')
+
+    % 4. Цикл WHILE и Boolean %
+    boolean aa = TRUE
+    integer counter = 3
+    print('While countdown: ')
+    while {aa != FALSE} (
+        print(counter)
+        counter = counter - 1
+        if {counter == 0} (
+            aa = FALSE
+        ) else (
+            print(', ')
+        )
+    )
+    print('\nDone!\n')
+)

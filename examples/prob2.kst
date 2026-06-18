@@ -1,0 +1,32 @@
+{}
+main (
+    integer a = sum_arithm(1, 100, 100)
+    integer aa = square(a)
+
+    integer b = 0
+    
+    for {integer i = 1 : i < 101 : i = i + 1} (
+        integer c = square(i)
+        b = b + c
+    )
+
+    % alternative: using n(n + 1)(2n + 1) / 6
+    % integer d = 100 * 101 * 201 / 6
+
+    integer result = aa - b
+    print(result)
+)
+
+{integer a}
+integer square (
+    return a * a
+)
+
+% 5050
+
+{integer first, integer last, integer amount}
+integer sum_arithm (
+    integer a = first + last
+    integer b = amount * a
+    return b / 2
+)

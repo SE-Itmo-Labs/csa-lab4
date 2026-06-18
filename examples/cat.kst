@@ -1,0 +1,17 @@
+{}
+integer main (
+    enable_interrupts()
+    while { TRUE } (
+        % wait for interruption %
+    )
+)
+
+interrupt io (
+    char c = read_char()
+    integer eof = 0 - 999
+    if { c == eof } (
+        exit()
+    ) else (
+        print(c)
+    )
+)

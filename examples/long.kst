@@ -1,0 +1,8 @@
+{}
+main (
+    long a = 4000000000L  
+    long b = 1000000000L
+    long c = a + b
+    print(c)
+    print('\n')
+)

@@ -1,0 +1,6 @@
+{}
+main (
+    string test2 = 'Arseniy Starikov'
+
+    print(test2)
+)

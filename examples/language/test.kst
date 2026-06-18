@@ -1,0 +1,29 @@
+%
+Это тестовая программа на языке Kronstadt.
+Проверяем работу переменных, математики и вывода.
+%
+{}
+integer main (
+    
+    integer a = 15
+    integer b = 5
+    
+    integer result = a + b
+    
+    print(result) % Должно вывести 20 %
+    
+    result = result - 3
+
+    print('\n')
+    
+    print(result) % Должно вывести 17 %
+
+    integer test = func()
+
+    print(result)
+)
+
+{integer test, char eerfdsf}
+integer func (
+    return 228
+)

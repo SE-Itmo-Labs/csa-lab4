@@ -1,0 +1,34 @@
+{}
+main (
+    enable_interrupts()
+
+    integer test = 0
+    test = rec()
+)
+
+{}
+rec (
+    test = 1234
+    return rec()
+)
+
+interrupt io (
+    string test = 'AAA'
+
+    print(test)
+)
+
+interrupt so_data (
+
+    string test = 'FATAL ERROR : DATA STACK OVERFLOW'
+
+    print(test)
+    exit()
+)
+
+interrupt so_ret (
+    string test = 'AA'
+
+    print(test)
+    exit()
+)

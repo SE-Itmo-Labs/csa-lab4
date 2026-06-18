@@ -1,0 +1,28 @@
+{}
+integer main (
+    enable_interrupts()
+
+    print('>>> Forcing Stack Overflow...\n')
+    
+    integer result = 0
+    for {integer i = 0 : i < 5 : i = i + 1} (
+        result = result + 2
+    )
+)
+
+interrupt io (
+    print('meow~!')
+    char c = read_char()
+    print(c)
+    print('\n')
+)
+
+interrupt so_data (
+    print('>>> HARDWARE FAULT: DATA STACK OVERFLOW CAUGHT!\n')
+    exit()
+)
+
+interrupt so_ret (
+    print('>>> HARDWARE FAULT: RETURN STACK OVERFLOW CAUGHT!\n')
+    exit()
+)

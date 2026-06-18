@@ -1,0 +1,86 @@
+% Global variables %
+
+global integer[100] arr
+global integer arr_ptr = arr
+global integer length = 0
+global integer flag = 1
+
+{}
+integer main (
+    enable_interrupts()
+    print('> Enter numbers:\n< ')
+
+    % Waiting for \0-terminatior %
+    while { flag != 0 } ()
+
+    print('\n> Unsorted array:\n')
+    print_array()
+
+    print('> Sorting with Insertion Sort...\n')
+    insertion_sort()
+
+    print('> Sorted array:\n')
+    print_array()
+    
+    print('\n')
+)
+
+% Array print %
+{}
+print_array (
+    integer p = arr
+    for {integer i = 0 : i < length : i = i + 1} (
+        print(p&)
+        print(' \n')
+        p = p + 1
+    )
+    print('\n')
+)
+
+% Insertion sort %
+{}
+insertion_sort (
+    for {integer i = 1 : i < length : i = i + 1} (
+        integer ptr_i = arr + i
+        integer key = ptr_i&
+
+        integer j = i - 1
+        boolean loop = TRUE
+
+        while { loop != FALSE } (
+            if { j < 0 } (
+                loop = FALSE
+            ) else (
+                integer ptr_j = arr + j
+                integer val_j = ptr_j&
+                
+                if { val_j > key } (
+                    integer ptr_j_next = ptr_j + 1
+                    ptr_j_next& = val_j
+                    j = j - 1
+                ) else (
+                    loop = FALSE
+                )
+            )
+        )
+        
+        integer ptr_insert = arr + j
+        ptr_insert = ptr_insert + 1
+        ptr_insert& = key
+    )
+)
+
+% IO %
+interrupt io (
+    integer c = read_char()
+
+    integer aa = 0 - 999
+
+    if { c == aa } (
+        flag = 0
+    ) else (
+        arr_ptr& = c
+        arr_ptr = arr_ptr + 1
+        length = length + 1
+    )
+)

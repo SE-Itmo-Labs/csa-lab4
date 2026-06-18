@@ -1,0 +1,11 @@
+{}
+integer main(
+    float a = 64f
+    float b = 8f
+
+    float result = a / b
+
+    print(result)
+
+    return result
+)

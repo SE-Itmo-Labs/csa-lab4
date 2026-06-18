@@ -1,0 +1,41 @@
+
+global char[100] test
+global char* test_ptr = test
+global integer length = 0
+global integer flag = 1
+
+{}
+integer main (
+    enable_interrupts()
+    print('> What is your name?\n< ')
+
+    test_ptr = test
+
+    while { flag != 0 } (
+        % Ждем, пока прерывание считает всё и поставит flag = 0 %
+    )
+
+    print('\n> Hello, ')
+
+    % КРИТИЧНО: Возвращаем указатель на начало массива перед печатью %
+    test_ptr = test 
+
+    for {integer i = 0 : i < length : i = i + 1} (
+        print(test_ptr&)
+        test_ptr = test_ptr + 1
+    )
+    print('!\n')
+)
+
+interrupt io (
+    char c = read_char()
+    integer eof = 0 - 999
+    if { c == eof } (
+        flag = 0
+    ) else (
+        print(c)
+        test_ptr& = c          % Записать символ в память по адресу в test_ptr %
+        test_ptr = test_ptr + 1 % Сдвинуть указатель %
+        length = length + 1
+    )
+)

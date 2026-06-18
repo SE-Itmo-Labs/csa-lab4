@@ -1,0 +1,7 @@
+{}
+integer main (
+
+    string hello = 'Hello, World!'
+
+    print(hello)
+)

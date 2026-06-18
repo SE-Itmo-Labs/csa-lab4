@@ -1,0 +1,28 @@
+{}
+main (
+    enable_interrupts()
+
+    print('>>> Forcing Stack Overflow...\n')
+    
+    integer i = 1 
+
+    test(i)
+)
+
+{integer counter}
+test (
+    print(counter)
+    print(' ')
+
+    counter = counter + 1
+
+    test(counter)
+)
+
+interrupt so_ret (
+    print('>>> HARDWARE FAULT: RETURN STACK OVERFLOW CAUGHT!\n')
+
+    test(64)
+    
+    exit()
+)

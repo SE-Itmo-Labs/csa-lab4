@@ -1,0 +1,126 @@
+{}
+integer main (
+    print('=== KRONSTADT MATH & LOGIC TEST ===\n\n')
+
+    print('1. Integer Arithmetic\n')
+    integer a = 25
+    integer b = 4
+    
+    print('a = 25, b = 4\n')
+    
+    print('a + b = ')
+    print(a + b)
+    print('\n')
+
+    print('a - b = ')
+    print(a - b)
+    print('\n')
+
+    print('a * b = ')
+    print(a * b)
+    print('\n')
+
+    print('a / b = ')
+    print(a / b)
+    print('\n\n')
+
+    print('2. Floating Point Arithmetic (IEEE-754)\n')
+    float x = 10.5f
+    float y = 2.5f
+
+    print('x = 10.5, y = 2.5\n')
+    
+    print('x + y = ')
+    print(x + y)
+    print('\n')
+
+    print('x - y = ')
+    print(x - y)
+    print('\n')
+
+    print('x * y = ')
+    print(x * y)
+    print('\n')
+
+    print('x / y = ')
+    print(x / y)
+    print('\n\n')
+
+    print('3. Logic & Comparisons\n')
+    integer flag = 0
+
+    if {a > b} (
+        flag = 1
+        print('25 > 4 is TRUE\n')
+    ) else (
+        print('ERROR in > operator\n')
+    )
+
+    if {x < y} (
+        print('ERROR in < operator\n')
+    ) else (
+        flag = flag + 1
+        print('10.5 < 2.5 is FALSE\n')
+    )
+
+    if {a != 0} (
+        flag = flag + 1
+        print('25 != 0 is TRUE\n')
+    ) else (
+        print('ERROR in != operator\n')
+    )
+
+    print('Logic passed tests: ')
+    print(flag)
+    print('/3\n\n')
+
+    print('4. Complex Subroutines & Recursion\n')
+    print('Calculating 6! (Factorial)...\n')
+    integer fact_result = factorial(6)
+    print('6! = ')
+    print(fact_result)
+    print('\n\n')
+
+    print('5. Loops & Accumulation\n')
+    print('Sum of floats (1.5 * i) for i from 1 to 4:\n')
+    
+    float f_sum = 0.0f
+    for {integer i = 1 : i < 5 : i = i + 1} (
+        float step_val = calc_float_step(i)
+        f_sum = f_sum + step_val
+    )
+    
+    print('Total Float Sum = ')
+    print(f_sum)
+    print('\n\n')
+
+    print('=== TEST FINISHED ===\n')
+)
+
+{integer n}
+integer factorial (
+    if {n == 1} (
+        return 1
+    ) else (
+        integer prev_n = n - 1
+        integer child_res = factorial(prev_n)
+        return n * child_res
+    )
+)
+
+{integer idx}
+float calc_float_step (
+    if {idx == 1} (
+        return 1.5f
+    ) else (
+        if {idx == 2} (
+            return 3.0f
+        ) else (
+            if {idx == 3} (
+                return 4.5f
+            ) else (
+                return 6.0f
+            )
+        )
+    )
+)
