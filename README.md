@@ -8,7 +8,7 @@ TODO
 # Лабораторная работа №4. Эксперимент
 
 - **Снагин Станислав Максимович, Р3215**
-- `alg | stack | neum | hw | tick | binary | trap | mem | cstr | prob2 | superscalar`
+- `alg | stack | neum | hw | tick | binary | trap | mem | cstr | prob2 | `~~superscalar~~
 
 ## Язык программирования (Kronstadt)
 
