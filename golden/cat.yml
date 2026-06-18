@@ -1,0 +1,55 @@
+in_source: |-
+  {}
+  integer main (
+      enable_interrupts()
+      while { TRUE } (
+          % wait for interruption %
+      )
+  )
+  
+  interrupt io (
+      char c = read_char()
+      integer eof = 0 - 999
+      if { c == eof } (
+          exit()
+      ) else (
+          print(c)
+      )
+  )
+in_input: |-
+  [(10, 'H'), (50, 'i'), (100, '\0')]
+out_code: |-
+  0005 - 13000047 - JMP 71
+  0006 - 19000000 - IRET
+  0007 - 19000000 - IRET
+  0040 - 13000041 - JMP 65
+  0041 - 13000042 - JMP 66
+  0042 - 18000000 - EI
+  0043 - 01000001 - PUSH 1
+  0044 - 14000046 - JZ 70
+  0045 - 13000043 - JMP 67
+  0046 - 17000000 - HALT
+  0047 - 010007FE - PUSH 2046
+  0048 - 02000000 - LOAD
+  0049 - 01000400 - PUSH 1024
+  004A - 03000000 - STORE
+  004B - 01000000 - PUSH 0
+  004C - 010003E7 - PUSH 999
+  004D - 07000000 - SUB
+  004E - 01000401 - PUSH 1025
+  004F - 03000000 - STORE
+  0050 - 01000400 - PUSH 1024
+  0051 - 02000000 - LOAD
+  0052 - 01000401 - PUSH 1025
+  0053 - 02000000 - LOAD
+  0054 - 0F000000 - CMP
+  0055 - 14000058 - JZ 88
+  0056 - 17000000 - HALT
+  0057 - 1300005C - JMP 92
+  0058 - 01000400 - PUSH 1024
+  0059 - 02000000 - LOAD
+  005A - 010007FF - PUSH 2047
+  005B - 03000000 - STORE
+  005C - 19000000 - IRET
+out_stdout: |-
+  Hi
