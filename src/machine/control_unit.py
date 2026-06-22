@@ -15,12 +15,12 @@ def bits_to_float(i: int) -> float:
     return struct.unpack('>f', struct.pack('>i', i))[0]
 
 def to_signed32(val):
-    """ Аппаратное усечение до 32 бит со знаком """
     val &= 0xFFFFFFFF
     return val - 0x100000000 if val & 0x80000000 else val
 
+# IEEE-754
+
 def unpack_f32(bits):
-    """ Аппаратная распаковка IEEE-754 """
     sign = (bits >> 31) & 1
     exp = (bits >> 23) & 0xFF
     frac = bits & 0x7FFFFF
@@ -28,7 +28,6 @@ def unpack_f32(bits):
     return sign, exp, mant
 
 def pack_f32(sign, exp, mant):
-    """ Аппаратная упаковка IEEE-754 """
     if exp <= 0: return 0
     if exp >= 255: return (sign << 31) | (0xFF << 23)
     frac = mant & 0x7FFFFF
@@ -94,7 +93,7 @@ class ControlUnit:
         if self.dp.irq_so_ret:
             self.dp.irq_so_ret = False
             self.ie = False
-            self.dp.push_rs(self.pc)
+            self.dp.push_rs(self.pc, is_hw = True)
             self.pc = VECTOR_SO_RET
             logging.warning(f"Tick: {self.tick_counter:04d} | HARDWARE FAULT: Return Stack Overflow!")
             return
@@ -102,7 +101,7 @@ class ControlUnit:
         if self.dp.irq_so_data:
             self.dp.irq_so_data = False
             self.ie = False
-            self.dp.push_rs(self.pc)
+            self.dp.push_rs(self.pc, is_hw = True)
             self.pc = VECTOR_SO_DATA
             logging.warning(f"Tick: {self.tick_counter:04d} | HARDWARE FAULT: Data Stack Overflow!")
             return
@@ -111,7 +110,7 @@ class ControlUnit:
         if self.dp.irq_io and self.ie:
             self.dp.irq_io = False
             self.ie = False
-            self.dp.push_rs(self.pc)
+            self.dp.push_rs(self.pc, is_hw = True)
             self.pc = VECTOR_IO
             logging.debug(f"Tick: {self.tick_counter:04d} | IO INTERRUPT Triggered! Jumping to {VECTOR_IO:04X}")
             return
@@ -123,7 +122,6 @@ class ControlUnit:
         
         self.log_tick(self.current_op.name, self.current_arg, "FETCH")
         
-        # Инициализируем генератор микро-шагов для этой инструкции
         self.instr_gen = self.execute_instruction(self.current_op, self.current_arg)
 
     def execute_instruction(self, op: Opcode, arg: int):
@@ -133,7 +131,7 @@ class ControlUnit:
             self.log_tick(op_name, arg, "NOP command")
             yield
         
-        # Состояния, связанные с yield, есть конечные автоматы, т.е. типа step_counter'ов
+        # yield - последовательная схема / конечные автоматы
         elif op == Opcode.HALT: 
             self.halted = True
             self.log_tick(op_name, arg, "HALT Latch")
@@ -279,7 +277,6 @@ class ControlUnit:
             yield
 
         elif op == Opcode.SHL:
-            # Сдвигаем S(S) на T(T) бит. Ограничиваем сдвиг маской 0x1F (до 31 бита)
             res = (self.dp.s << (self.dp.t & 0x1F)) & 0xFFFFFFFF
             self.dp.pop(); self.dp.pop()
             self.dp.push(to_signed32(res))
@@ -294,7 +291,7 @@ class ControlUnit:
             yield
 
         elif op in (Opcode.CMP, Opcode.NEQ, Opcode.GT, Opcode.LT):
-            # АЛУ выполняет логическое вычитание и выставляет флаги
+            # flags
             t_inv = (~self.dp.t) & 0xFFFFFFFF
             res = (self.dp.s + t_inv + 1) & 0xFFFFFFFF
             
@@ -443,18 +440,25 @@ class ControlUnit:
                 ec = ea + eb - 127
                 self.log_tick(op_name, arg, "FPU: Умножение мантисс")
                 yield
-                mc = ma * mb
+                
+                mc = 0
+                for i in range(24):
+                    self.log_tick(op_name, arg, f"FPU: FMUL Step {i+1}/24")
+                    if (mb >> i) & 1:
+                        mc += ma << i
+                    yield
                 
                 self.log_tick(op_name, arg, "FPU: Нормализация и Округление")
                 yield
-                if mc & (1 << 47): # Значение >= 2.0
+                if mc & (1 << 47):
                     mc >>= 24
                     ec += 1
                 else: 
                     mc >>= 23
                 res = pack_f32(sc, ec, mc)
                 
-            self.dp.pop(); self.dp.pop()
+            self.dp.pop()
+            self.dp.pop()
             self.dp.push(res)
             self.log_tick(op_name, arg, "FPU Result Latch")
             yield
@@ -474,7 +478,15 @@ class ControlUnit:
                 self.log_tick(op_name, arg, "FPU: Деление мантисс")
                 yield
                 
-                mc = (ma << 24) // mb
+                dividend = ma << 24
+                divisor = mb
+                mc = 0
+                for i in range(25, -1, -1):
+                    self.log_tick(op_name, arg, f"FPU: FDIV Step {26 - i}/26")
+                    if dividend >= (divisor << i):
+                        dividend -= divisor << i
+                        mc |= (1 << i)
+                    yield
                 
                 self.log_tick(op_name, arg, "FPU: Нормализация")
                 yield
@@ -484,7 +496,8 @@ class ControlUnit:
                 mc >>= 1
                 res = pack_f32(sc, ec, mc)
                 
-            self.dp.pop(); self.dp.pop()
+            self.dp.pop()
+            self.dp.pop()
             self.dp.push(res)
             self.log_tick(op_name, arg, "FPU Result Latch")
             yield

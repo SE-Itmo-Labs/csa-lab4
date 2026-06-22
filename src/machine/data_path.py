@@ -43,7 +43,7 @@ class DataPath:
         
         self.data_stack[self.dsp] = val
         self.dsp += 1
-        # Генерируем прерывание ровно при достижении 63 (1 ячейка в резерве)
+
         if self.dsp == DATA_STACK_SIZE - 1:
             self.irq_so_data = True
 
@@ -54,16 +54,17 @@ class DataPath:
         return self.data_stack[self.dsp]
     
     def clear_data_stack(self):
-        # Аппаратный сброс указателя (reset latch)
         self.dsp = 0
         
     def clear_return_stack(self):
         self.rsp = 0
         self.r = 0
 
-    def push_rs(self, val: int):
+    def push_rs(self, val: int, is_hw: bool = False):
 
         if self.rsp >= RETURN_STACK_SIZE:
+            if not is_hw:
+                raise RuntimeError("FATAL ERROR: DOUBLE FAULT (RS OVERFLOW)")
             return 
         
         self.return_stack[self.rsp] = self.r
