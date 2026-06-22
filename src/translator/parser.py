@@ -33,6 +33,8 @@ class Parser:
             elif self.match('KEYWORD', 'global'):
                 vtype = self.expect('KEYWORD')
                 
+                # Обработка global char[100] name
+                # Если видим '[', значит это аллокация массива
                 if self.current()[1] == '[':
                     self.expect('PUNCT', '[')
                     size = int(self.expect('INT'))
@@ -42,6 +44,7 @@ class Parser:
                     expr = ArrayAlloc(vtype, size)
                     vtype += '*'
                 else:
+                    # Обычный формат: global integer flag = 1
                     if self.match('OP', '*'): vtype += '*'
                     name = self.expect('ID')
                     self.expect('OP', '=')
@@ -141,8 +144,8 @@ class Parser:
             return Assign(name, expr)
         raise SyntaxError(f"Unexpected token {self.current()}")
 
-
-
+    # Простой парсер выражений (с учетом приоритетов)
+    
     def parse_expr(self): return self.parse_equality()
 
     def parse_bitwise_or(self):
@@ -239,6 +242,7 @@ class Parser:
         elif self.match('BOOL'): return Literal('boolean', 1 if c[1] == 'TRUE' else 0)
 
         
+        # ОБРАБОТКА \n В СТРОКАХ:
         elif self.match('STRING'): 
             val = c[1].strip("'").encode('utf-8').decode('unicode_escape')
             return Literal('string', val)

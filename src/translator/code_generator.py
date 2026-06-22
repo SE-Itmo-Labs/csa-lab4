@@ -71,6 +71,7 @@ class Compiler:
                 self.functions[stmt.name] = self.pc
                 if stmt.name == 'main': self.backpatch(jmp_main, self.pc)
                 
+                # Магия: выгружаем параметры из стека в статические переменные
                 for vtype, arg_name in reversed(stmt.args):
                     if arg_name not in self.symbols:
                         self.symbols[arg_name] = {'addr': self.next_data, 'type': vtype}
@@ -209,10 +210,10 @@ class Compiler:
 
             if is_optimizable:
 
-                self.gen_stmt(node.init) 
+                self.gen_stmt(node.init) # i = 0
 
                 self.gen_expr(limit_expr)
-                self.gen_expr(init_expr) 
+                self.gen_expr(init_expr) # Count iter amount
                 self.emit(Opcode.SUB)
 
                 self.emit(Opcode.DUP)
@@ -248,21 +249,21 @@ class Compiler:
         elif isinstance(node, Print):
             expr_type = self.gen_expr(node.expr) # Получаем тип выражения
             if expr_type == 'string':
-                
+                # Вывод нуль-терминированной C-String. На стеке лежит УКАЗАТЕЛЬ
                 loop_start = self.pc
                 self.emit(Opcode.DUP)       # [ptr, ptr]
                 self.emit(Opcode.LOAD)      # [ptr, char]
                 self.emit(Opcode.DUP)       # [ptr, char, char]
-                jz_end = self.emit(Opcode.JZ, 0)
+                jz_end = self.emit(Opcode.JZ, 0) # прыгает если char == 0
                 self.emit(Opcode.PUSH, MMIO_OUTPUT_CHAR)
-                self.emit(Opcode.STORE) 
+                self.emit(Opcode.STORE)     # Выводим char (TOS и порт съедаются)
                 self.emit(Opcode.PUSH, 1)
                 self.emit(Opcode.ADD)       # ptr = ptr + 1
                 self.emit(Opcode.JMP, loop_start)
                 
                 self.backpatch(jz_end, self.pc)
-                self.emit(Opcode.DROP)     
-                self.emit(Opcode.DROP)  
+                self.emit(Opcode.DROP)      # Убираем 0 из стека
+                self.emit(Opcode.DROP)      # Убираем сам указатель
             else:
                 port = MMIO_OUTPUT_FLOAT if expr_type in ('float','double') else (MMIO_OUTPUT_CHAR if expr_type=='char' else MMIO_OUTPUT_NUM)
                 self.emit(Opcode.PUSH, port)
@@ -278,7 +279,7 @@ class Compiler:
             
         elif isinstance(node, Call):
             self.gen_expr(node)
-
+            # stdcall: Callee cleans args, Caller drops unused result only
             if self.function_types.get(node.name) is not None:
                 self.emit(Opcode.DROP)
 
