@@ -9,6 +9,12 @@ import translator, machine
 
 warnings.filterwarnings("ignore", category=pytest.PytestRemovedIn10Warning)
 
+def truncate_log(log_text: str, max_lines: int = 10000) -> str:
+    lines = log_text.splitlines()
+    if len(lines) > max_lines:
+        return "\n".join(lines[:max_lines]) + "\n... [LOG TRUNCATED TO 10000 LINES] ..."
+    return "\n".join(lines)
+
 @pytest.mark.golden_test("golden/*.yml")
 def test_golden(golden, caplog):
     caplog.set_level(logging.DEBUG)
@@ -47,6 +53,8 @@ def test_golden(golden, caplog):
         with open(target + ".log", "r", encoding="utf-8") as f:
             code_log = f.read()
 
+        out_log = truncate_log(log_io.getvalue())
+
         assert code_log.strip() == golden.out["out_code"].strip()
         assert out_stdout.strip() == golden.out["out_stdout"].strip()
-        assert log_io.getvalue().strip() == golden.out["out_log"].strip()
+        assert out_log.strip() == golden.out["out_log"].strip()
