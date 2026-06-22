@@ -7,9 +7,9 @@ class Opcode(IntEnum):
     PUSH = 0x01
     LOAD = 0x02
     STORE = 0x03
-    DUP = 0x04       # Дублировать TOS (Top of Stack)
-    DROP = 0x05      # Удалить TOS
-    TOR = 0x21       # TOS -> R (Return Stack)
+    DUP = 0x04       # T -> S, T -> T
+    DROP = 0x05      # DS.pop()
+    TOR = 0x21       # T -> R
     NEXT = 0x22      # if R != 0: R--, JMP arg. else: POP RS
     
     # Integer
